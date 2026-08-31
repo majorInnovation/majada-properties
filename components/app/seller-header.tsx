@@ -1,10 +1,11 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
-import { Building2, LayoutDashboard, Plus } from 'lucide-react'
+import { Building2, LayoutDashboard, Plus, Settings } from 'lucide-react'
 import { getSessionProfile } from '@/lib/auth'
 import { getUnreadCount } from '@/lib/queries'
-import { SignOutButton } from './sign-out-button'
 import { MessagesNavItem } from './messages-nav-item'
 import { MobileTabBar } from './mobile-tab-bar'
+import { DashboardTabs } from './dashboard-tabs'
 
 const NAV = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -14,6 +15,7 @@ const NAV = [
 export async function SellerHeader({ active }: { active: string }) {
   const { userId } = await getSessionProfile()
   const unread = userId ? await getUnreadCount(userId) : 0
+  const onDashboard = active === '/dashboard'
 
   return (
     <>
@@ -31,7 +33,7 @@ export async function SellerHeader({ active }: { active: string }) {
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-2 rounded-full border border-border bg-muted/60 p-1.5 md:flex">
+          <nav className="flex items-center gap-2 rounded-full border border-border bg-muted/60 p-1.5 max-md:hidden">
             {NAV.map(({ label, href, icon: Icon }) => (
               <Link
                 key={href}
@@ -52,10 +54,34 @@ export async function SellerHeader({ active }: { active: string }) {
               initialUnread={unread}
               currentUserId={userId ?? ''}
             />
+            <Link
+              href="/dashboard?tab=settings"
+              className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Settings size={15} />
+              Settings
+            </Link>
           </nav>
 
-          <SignOutButton />
+          {!onDashboard && (
+            <Link
+              href="/dashboard?tab=settings"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted md:hidden"
+            >
+              <Settings size={15} />
+              Settings
+            </Link>
+          )}
         </div>
+
+        {/* Mobile: the four dashboard views live up here, right under the logo. */}
+        {onDashboard && (
+          <div className="border-t border-border bg-card/95 md:hidden">
+            <Suspense fallback={<div className="h-11" />}>
+              <DashboardTabs variant="header" />
+            </Suspense>
+          </div>
+        )}
       </header>
 
       <MobileTabBar role="seller" currentUserId={userId ?? ''} initialUnread={unread} />

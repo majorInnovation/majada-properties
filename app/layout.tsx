@@ -6,21 +6,8 @@ export const metadata: Metadata = {
   title: 'Majada Properties | Find a place to belong',
   description: 'Discover verified homes, apartments, and land across Zambia with Majada Properties.',
   generator: 'v0.app',
+  // Favicon comes from app/icon.svg (Next file convention).
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
     apple: '/apple-icon.png',
   },
 }

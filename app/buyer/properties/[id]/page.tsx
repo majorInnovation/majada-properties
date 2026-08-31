@@ -45,7 +45,7 @@ export default async function PropertyDetailPage({
   const agent = property.owner
 
   return (
-    <main className="min-h-screen bg-background pb-20 text-foreground md:pb-0">
+    <main className="min-h-screen bg-background pb-10 text-foreground">
       <BuyerHeader active="/buyer" />
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-5 sm:py-8 lg:px-8">

@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { requireRole } from '@/lib/auth'
 import { getConversationsForUser, getSellerProperties } from '@/lib/queries'
 import { SellerHeader } from '@/components/app/seller-header'
@@ -23,8 +24,12 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-background pb-20 text-foreground md:pb-0">
-      <SellerHeader active="/dashboard" />
-      <DashboardClient listings={listings} inquiries={inquiries} profile={profile} />
+      <Suspense fallback={<div className="h-16 border-b border-border bg-card" />}>
+        <SellerHeader active="/dashboard" />
+      </Suspense>
+      <Suspense fallback={null}>
+        <DashboardClient listings={listings} inquiries={inquiries} profile={profile} />
+      </Suspense>
     </main>
   )
 }

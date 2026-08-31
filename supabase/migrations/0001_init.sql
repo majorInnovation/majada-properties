@@ -33,9 +33,17 @@ create table if not exists public.profiles (
   phone       text,
   email       text,
   avatar_url  text,
+  company     text,
+  bio         text,
+  preferences jsonb not null default '{}'::jsonb,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
+
+-- For databases created before these columns existed:
+alter table public.profiles add column if not exists company     text;
+alter table public.profiles add column if not exists bio         text;
+alter table public.profiles add column if not exists preferences jsonb not null default '{}'::jsonb;
 
 -- ---------------------------------------------------------------------------
 -- properties

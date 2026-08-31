@@ -8,13 +8,17 @@ import { PropertyCard } from './property-card'
 export function BuyerBrowseClient({
   properties,
   savedIds,
+  initialLocation = '',
+  initialMinBeds = 0,
 }: {
   properties: PropertyWithRelations[]
   savedIds: string[]
+  initialLocation?: string
+  initialMinBeds?: number
 }) {
   const [tab, setTab] = useState<'Buy' | 'Rent'>('Buy')
-  const [location, setLocation] = useState('')
-  const [minBeds, setMinBeds] = useState(0)
+  const [location, setLocation] = useState(initialLocation)
+  const [minBeds, setMinBeds] = useState(initialMinBeds)
 
   const savedSet = useMemo(() => new Set(savedIds), [savedIds])
 

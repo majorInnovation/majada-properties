@@ -3,19 +3,12 @@
 import Link from 'next/link'
 import { useActionState, useEffect, useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  Building2,
-  Eye,
-  Loader2,
-  MessageCircle,
-  Plus,
-  Settings,
-  Trash2,
-} from 'lucide-react'
+import { Building2, Eye, Loader2, MessageCircle, Plus, Trash2 } from 'lucide-react'
 import type { Profile, PropertyWithRelations } from '@/lib/types'
 import { formatPrice, listingLabel, locationLabel } from '@/lib/format'
 import { deleteProperty, setPropertyStatus, updateProperty } from '@/app/actions/properties'
-import { ProfileForm } from './profile-form'
+import { DashboardTabs, useDashboardView, type DashboardView } from './dashboard-tabs'
+import { SellerSettings } from './seller-settings'
 
 type Inquiry = {
   id: string
@@ -24,8 +17,6 @@ type Inquiry = {
   lastMessage: string
   lastAt: string | null
 }
-
-type View = 'overview' | 'listings' | 'inquiries' | 'settings'
 
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-accent text-accent-foreground',
@@ -44,10 +35,15 @@ export function DashboardClient({
   profile: Profile
 }) {
   const router = useRouter()
-  const [view, setView] = useState<View>('overview')
+  const view = useDashboardView()
   const [editing, setEditing] = useState<PropertyWithRelations | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
+
+  const goto = (v: DashboardView) =>
+    router.replace(v === 'overview' ? '/dashboard' : `/dashboard?tab=${v}`, {
+      scroll: false,
+    })
 
   const stats = useMemo(() => {
     const active = listings.filter((l) => l.status === 'active').length
@@ -95,19 +91,10 @@ export function DashboardClient({
         </Link>
       </div>
 
-      <nav className="mt-6 flex gap-1 overflow-x-auto rounded-full border border-border bg-muted/60 p-1.5 sm:mt-8 sm:gap-2 [&::-webkit-scrollbar]:hidden">
-        {(['overview', 'listings', 'inquiries', 'settings'] as View[]).map((v) => (
-          <button
-            key={v}
-            onClick={() => setView(v)}
-            className={`shrink-0 rounded-full px-3 py-2 text-sm font-medium capitalize transition-colors sm:px-4 ${
-              view === v ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {v}
-          </button>
-        ))}
-      </nav>
+      {/* On phones these four live in the sticky header instead. */}
+      <div className="mt-6 hidden sm:mt-8 md:block">
+        <DashboardTabs variant="inline" />
+      </div>
 
       {view === 'overview' && (
         <>
@@ -128,7 +115,7 @@ export function DashboardClient({
                 onToggle={() => toggleStatus(l)}
                 onEdit={() => {
                   setEditing(l)
-                  setView('listings')
+                  goto('listings')
                 }}
                 onDelete={() => removeListing(l.id)}
               />
@@ -204,17 +191,8 @@ export function DashboardClient({
       )}
 
       {view === 'settings' && (
-        <div className="mt-8 max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <div className="mb-6 flex items-center gap-3">
-            <span className="grid size-11 place-items-center rounded-xl bg-accent text-primary">
-              <Settings size={20} />
-            </span>
-            <div>
-              <h2 className="font-serif text-2xl tracking-tight sm:text-3xl">Seller profile</h2>
-              <p className="text-sm text-muted-foreground">Buyers see this name and phone number on your listings.</p>
-            </div>
-          </div>
-          <ProfileForm profile={profile} />
+        <div className="max-w-3xl">
+          <SellerSettings profile={profile} />
         </div>
       )}
     </div>
